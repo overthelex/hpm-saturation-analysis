@@ -2,10 +2,9 @@
 
 **Working draft · v0.1 · 2026-07-20**
 
-> Draft assembled from the E1–E3 prototypes in this repository. Numbers are from the
+> Draft assembled from the E1–E4 prototypes in this repository. Numbers are from the
 > order-of-magnitude simulator (`hpm-saturation-model.md`); treat as a preliminary-results
-> skeleton, not a finished paper. E4 (rare-event tail certification) and E5 (sensitivity)
-> are in progress.
+> skeleton, not a finished paper. E5 (sensitivity attribution) is in progress.
 
 ---
 
@@ -175,8 +174,19 @@ price of a sound distribution-free guarantee.
 
 ![E3](analysis/e3_certificate.png)
 
-*(E4 — subset-simulation certification of the small penetration probability `Pr_ω[leak≥τ]`,
-strengthening the marginal guarantee toward a per-config tail bound — in progress.)*
+### 5.4 E4 — rare-event tail certification
+
+E3 certifies the *mean* leak; a `∀ a ∈ Â` guarantee ultimately needs the small **tail
+probability** `p(a)=Pr_ω[leak≥τ]`. Making the randomness explicit (`ω∈R^{120}` perturbing
+spawn geometry; hard-step kill so `g(ω)=leak(ω)` is deterministic), we estimate `p` by
+Subset Simulation. On a marginal safe config (`E[leak]≈0.0017`): at a **moderate** level
+where naive MC is reliable, subset simulation **agrees within 0.9×** (`3.0e-2` vs `3.5e-2`)
+using 12% of the naive budget — validating the estimator; at a **rare** level where naive MC
+sees a single event, subset simulation resolves `p ≈ 1.0e-3 ± 3.7e-4` across 4 runs, ~11×
+more sample-efficient than naive MC would need. This moves the certificate from the mean
+toward a per-configuration tail bound.
+
+![E4](analysis/e4_ccdf.png)
 
 ---
 

@@ -1,0 +1,22 @@
+E4 — rare-event certification of penetration probability (Subset Simulation)
+  fixed attack: 60 drones, theta=15.0 t_c=0.6 n_cone=6; omega dim=120
+  (full: Ns=250, naive budget=4000, 4 SS runs)
+  E[leak] ~ 0.0017  (safe region: mean well below both thresholds)
+  naive Monte-Carlo (single pass) ...
+
+  [MODERATE (validation)]  leak >= tau = 0.033
+    naive MC : p=3.48e-02  (139 hits / 4000, rel.err=0.08) [reliable]
+    subset   : p=2.98e-02 +/- 7.1e-03  (500 evals/run x 4 runs)
+    per-run  : ['3.0e-02', '2.8e-02', '2.1e-02', '4.1e-02']
+    -> naive is reliable here; subset-sim agrees within 0.9x (VALIDATES the estimator) using ~12% of the naive budget
+
+  [RARE (subset-sim only)]  leak >= tau = 0.067
+    naive MC : p=2.50e-04  (1 hits / 4000, rel.err=1.00) [UNRELIABLE]
+    subset   : p=1.04e-03 +/- 3.7e-04  (937 evals/run x 4 runs)
+    per-run  : ['1.2e-03', '4.9e-04', '1.5e-03', '9.9e-04']
+    -> naive is near-blind (1 hits); subset-sim resolves p at ~937 evals; naive would need ~10,714 evals for CoV=0.3 (~11x)
+
+  SUMMARY: subset simulation is validated against naive MC where naive is reliable
+  (moderate tau), then resolves a rarer penetration probability that naive cannot
+  (rare tau) -- certifying the tail, not just the mean (tightens the E3 guarantee).
+  figure -> /home/vovkes/epirus/analysis/e4_ccdf.png
