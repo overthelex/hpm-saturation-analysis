@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HPM Saturation Analysis</title>
+<style>
+  :root { color-scheme: dark light; }
+  body { margin:0; min-height:100vh; background:#0a0e14; color:#cdd6e0;
+         font:15px/1.6 -apple-system,Segoe UI,Roboto,sans-serif;
+         display:grid; place-items:center; padding:3rem 1.2rem; }
+  .wrap { max-width:760px; width:100%; }
+  h1 { font-size:1.7rem; margin:0 0 .3rem; color:#eaf0f7; }
+  .sub { color:#7c8aa0; margin:0 0 2rem; }
+  .cards { display:grid; gap:.8rem; }
+  a.card { display:block; padding:1rem 1.2rem; background:#131b28; border:1px solid #253247;
+           border-radius:10px; color:#cdd6e0; text-decoration:none; transition:.15s; }
+  a.card:hover { border-color:#4a86e8; background:#152136; }
+  a.card b { color:#eaf0f7; }
+  a.card .d { color:#7c8aa0; font-size:13px; }
+  .foot { color:#5a6678; font-size:12px; margin-top:2rem; }
+  .foot a { color:#7c8aa0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>HPM Saturation Analysis</h1>
+  <p class="sub">Defensive counter-UAS red-team of a high-power-microwave (HPM) area defense —
+  saturation model, 3-D agent simulation, and a certification study. Order-of-magnitude,
+  open-source; strictly defensive scope.</p>
+
+  <div class="cards">
+    <a class="card" href="viz/">
+      <b>▶ 3-D scenario viewer</b>
+      <div class="d">Animated playback of real simulator trajectories — direct attack, zenith drop, hardening collapse, 600 km/h.</div>
+    </a>
+    <a class="card" href="paper.pdf">
+      <b>📄 Paper (PDF)</b>
+      <div class="d">Certified penetration-safety envelopes for directed-energy area defense (E1–E7).</div>
+    </a>
+    <a class="card" href="https://github.com/overthelex/hpm-saturation-analysis">
+      <b>⌥ Source & documents</b>
+      <div class="d">Model, simulator, experiments E1–E7, R/ggplot2 figures, results write-ups.</div>
+    </a>
+  </div>
+
+  <p class="foot">All figures are order-of-magnitude on open-source assumptions.
+  Strictly defensive evaluation — see the <a href="https://github.com/overthelex/hpm-saturation-analysis#readme">README</a>.</p>
+</div>
+</body>
+</html>
