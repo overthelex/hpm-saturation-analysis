@@ -1,0 +1,12 @@
+E1 — GP surrogate + level-set active learning
+  slice: theta in (8.0, 32.0) deg x t_c in (0.1, 1.6) s; R_eff=500.0 v=30.0 N=80 tau=0.15
+  dense MC ground truth: 13x13=169 points x 3 seeds ...
+  active learning: tight budget = 24 queries (6 init + 18 straddle) ...
+  random baseline: 24 points x 4 seeds (averaged) ...
+
+  RESULTS (budget = 24 oracle queries; dense-MC grid = 169)
+    global surrogate RMSE (leak) : AL=0.0267   random=0.0370
+    BOUNDARY RMSE vs MC (t_c, s) : AL=0.038    random=0.179   <-- level-set metric
+    active-learning wins on boundary: YES (AL is +79% vs random)
+    sample efficiency            : 24 queries vs 169 dense grid (14%), boundary recovered to 0.038s
+  figure -> /home/vovkes/epirus/analysis/e1_surrogate.png
