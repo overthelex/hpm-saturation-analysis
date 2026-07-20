@@ -14,6 +14,7 @@ saturates, at what swarm size, and how to close the seams** — from the defende
 | File | What |
 |---|---|
 | `hpm-saturation-model.md` | The analytical model: angular/temporal saturation, fratricide & interior blind volume, three defensive locks. |
+| `hpm-open-source-intel.md` | OSINT + peer-reviewed physics used to calibrate the model: disclosed Leonidas TTX, analog range envelope, HPM field-kill thresholds (E₅₀≈200 V/m), P_k(r) derivation. |
 | `hpm-swarm-sim-design.md` | Design of the 3D agent simulation (method, scenarios, validation, roadmap). |
 | `epirus-pitch-memo.md` | One-page technical memo (envelope + 3 lead numbers + 3 fixes). |
 | `hectare-results.md` | Worked case: 1 hectare defended by 4 installations. |
