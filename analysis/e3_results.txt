@@ -1,0 +1,17 @@
+E3 — statistical certification of a penetration-safety envelope
+  slice theta(8.0, 32.0) x t_c(0.1, 1.6); tau=0.15, confidence=90%
+  sampling train (36) / calibration (36) / test (48) ...
+  conformal upper margin q = 0.0298  (U(a) = mu(a) + q)
+  (1) conformal coverage on test: 0.938  (target >= 0.90)
+  dense-MC truth on grid (high-seed) for soundness/tightness ...
+  (2) soundness  : false-safe rate = 0.000  (target <= 0.10)
+  (3) tightness  : |certified| / |true safe| = 0.929
+      certified 58% of the region as safe
+  (4) adversarial verification: black-box search restricted to certified set ...
+      worst true leak found inside Â = 0.125  (must stay < tau=0.15)
+      certificate holds vs adversary: YES
+
+  SUMMARY: a distribution-free conformal certificate yields a certified-safe
+  envelope Â that (1) has valid coverage, (2) is sound, (3) is reasonably tight, and
+  (4) survives an active adversarial search — the core deliverable of the proposal.
+  figure -> /home/vovkes/epirus/analysis/e3_certificate.png
