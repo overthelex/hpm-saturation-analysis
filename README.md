@@ -21,6 +21,7 @@ saturates, at what swarm size, and how to close the seams** — from the defende
 | `zenith-drop-results.md` | Over-the-top attack: drop into the zenith cone of silence; soft-kill can't stop inert falling mass ("hail" of dead-but-detonating drones). |
 | `leonidas-video-summary.md` | Section summary of the source video. |
 | `research-proposal-certified-defense.md` | Research proposal: certified penetration-safety envelopes for area defense (adversarial-robustness / certification transfer from ML). |
+| `paper-draft.md` | Working paper draft assembling methods + E1–E3 results into a coherent submission skeleton. |
 | `analysis/E1-results.md` | Preliminary E1: GP surrogate + level-set active learning recovers the failure boundary to 0.038 s using 14% of a dense grid, +79% vs random. |
 | `analysis/E2-results.md` | Preliminary E2: black-box adversarial search autonomously rediscovers both hand-derived modes (zenith drop; hardening/R_eff collapse), leak 0→1.0. |
 | `analysis/E3-results.md` | Preliminary E3 (core): conformal penetration-safety certificate — 94% coverage, 0 false-safe, 93% tight, and holds against an active adversary (worst leak in Â = 0.125 < τ). |
