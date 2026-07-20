@@ -23,6 +23,7 @@ saturates, at what swarm size, and how to close the seams** — from the defende
 | `research-proposal-certified-defense.md` | Research proposal: certified penetration-safety envelopes for area defense (adversarial-robustness / certification transfer from ML). |
 | `paper.pdf` / `paper.tex` | **Compiled LaTeX paper** (E1–E4, unified ggplot2 figures) — the submission draft. |
 | `paper-draft.md` | Markdown working draft (source for the LaTeX paper). |
+| `viz/` | **Three.js 3D viewer** — animated playback of all scenarios over time (real simulator trajectories). Serve with `python3 -m http.server` and open `viz/`. |
 | `figures/` | R/ggplot2 publication figures (SVG + PNG) + the data CSVs and build scripts. |
 | `analysis/E1-results.md` | Preliminary E1: GP surrogate + level-set active learning recovers the failure boundary to 0.038 s using 14% of a dense grid, +79% vs random. |
 | `analysis/E2-results.md` | Preliminary E2: black-box adversarial search autonomously rediscovers both hand-derived modes (zenith drop; hardening/R_eff collapse), leak 0→1.0. |

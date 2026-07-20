@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HPM Counter-Swarm — 3D scenarios</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html,body { margin:0; height:100%; background:#0a0e14; color:#cdd6e0;
+              font:13px/1.4 -apple-system,Segoe UI,Roboto,sans-serif; overflow:hidden; }
+  #app { position:fixed; inset:0; }
+  #panel { position:absolute; top:12px; left:12px; width:290px; background:rgba(16,22,32,.82);
+           border:1px solid #223; border-radius:10px; padding:14px; backdrop-filter:blur(6px); }
+  #panel h1 { font-size:14px; margin:0 0 2px; color:#eaf0f7; }
+  #panel .sub { color:#7c8aa0; font-size:11px; margin-bottom:10px; }
+  .scn { display:block; width:100%; text-align:left; margin:4px 0; padding:8px 10px;
+         background:#131b28; color:#cdd6e0; border:1px solid #253247; border-radius:7px; cursor:pointer; }
+  .scn:hover { border-color:#3a5a86; }
+  .scn.active { background:#183153; border-color:#4a86e8; color:#fff; }
+  .row { display:flex; align-items:center; gap:8px; margin-top:10px; }
+  #controls { position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+              width:min(760px,92vw); background:rgba(16,22,32,.82); border:1px solid #223;
+              border-radius:10px; padding:10px 14px; backdrop-filter:blur(6px); }
+  #time { width:100%; }
+  .btn { background:#1b2536; color:#dbe4ef; border:1px solid #2b3b54; border-radius:6px;
+         padding:6px 12px; cursor:pointer; }
+  .btn:hover { border-color:#4a86e8; }
+  .stat { display:inline-block; padding:2px 8px; border-radius:5px; margin-right:6px; font-variant-numeric:tabular-nums; }
+  .k { background:#2a2f3a; color:#9aa7b8; } .l { background:#3a1b22; color:#ff8a95; }
+  .a { background:#12313a; color:#7fe3ff; }
+  #legend { position:absolute; top:12px; right:12px; background:rgba(16,22,32,.82);
+            border:1px solid #223; border-radius:10px; padding:10px 12px; font-size:11px; }
+  #legend span { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+  .muted { color:#7c8aa0; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="panel">
+  <h1>HPM counter-swarm — 3D</h1>
+  <div class="sub">1 hectare · 4 corner installations · real simulator trajectories</div>
+  <div id="scnList"></div>
+  <div class="row" style="margin-top:8px">
+    <span class="stat a" id="sAlive">alive 0</span>
+    <span class="stat k" id="sKill">killed 0</span>
+    <span class="stat l" id="sLeak">leaked 0</span>
+  </div>
+</div>
+
+<div id="legend">
+  <div><span style="background:#7fe3ff"></span>alive drone</div>
+  <div><span style="background:#5a6472"></span>killed (HPM)</div>
+  <div><span style="background:#ff5a6a"></span>reached target</div>
+  <div style="margin-top:6px" class="muted">drag = orbit · wheel = zoom</div>
+</div>
+
+<div id="controls">
+  <div class="row">
+    <button class="btn" id="play">⏸ pause</button>
+    <input id="time" type="range" min="0" max="100" value="0" step="1">
+    <span id="tlabel" class="muted" style="min-width:74px;text-align:right">t = 0.0 s</span>
+  </div>
+  <div class="row" style="margin-top:6px">
+    <span class="muted">speed</span>
+    <input id="speed" type="range" min="1" max="60" value="24" step="1" style="width:120px">
+    <span id="scnName" class="muted" style="margin-left:auto"></span>
+  </div>
+</div>
+
+<script src="three.min.js"></script>
+<script>
+const CORNERS_UP = c => new THREE.Vector3(c[0], c[2], c[1]); // sim (x,y,z=alt) -> three (x, y=up, z)
+const S_ALIVE=0,S_KILL=1,S_LEAK=2,S_ESC=3;
+const COL = { 0:[0.5,0.89,1.0], 1:[0.35,0.39,0.45], 2:[1.0,0.35,0.42], 3:[0.3,0.42,0.6] };
+
+let data, scene, camera, renderer, drones, tmpMat=new THREE.Matrix4(), tmpCol=new THREE.Color();
+let beams=[], cur=0, frame=0, playing=true;
+let orbit={r:420,theta:0.9,phi:0.95,tx:0,ty:12,tz:0};
+
+function init(){
+  const app=document.getElementById('app');
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0a0e14);
+  scene.fog=new THREE.Fog(0x0a0e14, 500, 1400);
+  camera=new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 1, 5000);
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  app.appendChild(renderer.domElement);
+
+  scene.add(new THREE.HemisphereLight(0x8fb4ff,0x0a0e14,0.9));
+  const dl=new THREE.DirectionalLight(0xffffff,0.6); dl.position.set(120,300,80); scene.add(dl);
+
+  // ground grid + hectare outline
+  const grid=new THREE.GridHelper(600,60,0x22304a,0x151d2b); grid.position.y=0; scene.add(grid);
+  const hect=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(-50,0.2,-50),new THREE.Vector3(50,0.2,-50),
+    new THREE.Vector3(50,0.2,50),new THREE.Vector3(-50,0.2,50)]),
+    new THREE.LineBasicMaterial({color:0x3a5a86})); scene.add(hect);
+
+  // asset (protected point)
+  const asset=new THREE.Mesh(new THREE.SphereGeometry(6,24,24),
+    new THREE.MeshStandardMaterial({color:0x66ccff,emissive:0x2288cc,emissiveIntensity:0.8}));
+  scene.add(asset);
+  // asset keep-out ring
+  const ring=new THREE.Mesh(new THREE.RingGeometry(14,15.5,48),
+    new THREE.MeshBasicMaterial({color:0x2b6fb0,side:THREE.DoubleSide,transparent:true,opacity:0.5}));
+  ring.rotation.x=-Math.PI/2; ring.position.y=0.3; scene.add(ring);
+
+  // 4 installations
+  data.meta.apertures.forEach(c=>{
+    const p=CORNERS_UP(c);
+    const tower=new THREE.Mesh(new THREE.CylinderGeometry(2.2,3,p.y*2,12),
+      new THREE.MeshStandardMaterial({color:0x9bb0c9,metalness:.6,roughness:.4}));
+    tower.position.set(p.x,p.y,p.z); scene.add(tower);
+    const dome=new THREE.Mesh(new THREE.SphereGeometry(3.2,16,12),
+      new THREE.MeshStandardMaterial({color:0xd7e3f2,metalness:.5,roughness:.3}));
+    dome.position.set(p.x,p.y*2,p.z); scene.add(dome);
+  });
+
+  // drones as instanced spheres
+  const geo=new THREE.SphereGeometry(2.4,10,8);
+  const mat=new THREE.MeshBasicMaterial();          // instanceColor drives per-drone color
+  drones=new THREE.InstancedMesh(geo,mat,data.meta.n);
+  drones.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  drones.instanceColor=new THREE.InstancedBufferAttribute(new Float32Array(data.meta.n*3),3);
+  scene.add(drones);
+
+  buildScenarioButtons();
+  bindUI();
+  setScenario(0);
+  addEventListener('resize',onResize);
+  animate();
+}
+
+function buildScenarioButtons(){
+  const list=document.getElementById('scnList');
+  data.scenarios.forEach((s,i)=>{
+    const b=document.createElement('button'); b.className='scn'; b.textContent=s.name;
+    b.onclick=()=>setScenario(i); b.dataset.i=i; list.appendChild(b);
+  });
+}
+function setScenario(i){
+  cur=i; frame=0; playing=true; document.getElementById('play').textContent='⏸ pause';
+  document.querySelectorAll('.scn').forEach(b=>b.classList.toggle('active',+b.dataset.i===i));
+  const s=data.scenarios[i];
+  document.getElementById('time').max=s.frames.length-1;
+  document.getElementById('scnName').textContent=`${s.name} · N=${s.n}`;
+  clearBeams();
+}
+function clearBeams(){ beams.forEach(b=>scene.remove(b.line)); beams=[]; }
+
+function applyFrame(){
+  const s=data.scenarios[cur], f=s.frames[frame];
+  let alive=0,kill=0,leak=0;
+  for(let i=0;i<f.pos.length;i++){
+    const p=f.pos[i], st=f.st[i];
+    tmpMat.makeTranslation(p[0], p[2], p[1]); // sim z=alt -> three y
+    drones.setMatrixAt(i,tmpMat);
+    const c=COL[st]||COL[0]; tmpCol.setRGB(c[0],c[1],c[2]); drones.setColorAt(i,tmpCol);
+    if(st===S_ALIVE)alive++; else if(st===S_KILL)kill++; else if(st===S_LEAK)leak++;
+  }
+  drones.instanceMatrix.needsUpdate=true; drones.instanceColor.needsUpdate=true;
+  // beam flashes for kills this frame (from nearest aperture)
+  (f.killed||[]).forEach(idx=>{
+    const p=f.pos[idx]; const dp=new THREE.Vector3(p[0],p[2],p[1]);
+    let best=null,bd=1e9;
+    data.meta.apertures.forEach(c=>{const ap=CORNERS_UP(c); const d=ap.distanceTo(dp); if(d<bd){bd=d;best=ap;}});
+    const g=new THREE.BufferGeometry().setFromPoints([best.clone().setY(best.y*2),dp]);
+    const line=new THREE.Line(g,new THREE.LineBasicMaterial({color:0x9fe0ff,transparent:true,opacity:0.9}));
+    scene.add(line); beams.push({line,life:1});
+  });
+  document.getElementById('sAlive').textContent='alive '+alive;
+  document.getElementById('sKill').textContent='killed '+kill;
+  document.getElementById('sLeak').textContent='leaked '+leak;
+  document.getElementById('time').value=frame;
+  document.getElementById('tlabel').textContent='t = '+f.t.toFixed(1)+' s';
+}
+
+function fadeBeams(){
+  for(let i=beams.length-1;i>=0;i--){ const b=beams[i]; b.life-=0.12;
+    if(b.life<=0){ scene.remove(b.line); beams.splice(i,1); }
+    else b.line.material.opacity=b.life*0.9; }
+}
+
+let acc=0, last=performance.now();
+function animate(){
+  requestAnimationFrame(animate);
+  const now=performance.now(), dt=(now-last)/1000; last=now;
+  const fps=+document.getElementById('speed').value;
+  if(playing){ acc+=dt*fps; while(acc>=1){ acc-=1; frame++;
+    const n=data.scenarios[cur].frames.length; if(frame>=n){ frame=n-1; playing=false;
+      document.getElementById('play').textContent='↻ replay'; } } }
+  applyFrame(); fadeBeams();
+  // orbit camera
+  const {r,theta,phi,tx,ty,tz}=orbit;
+  camera.position.set(tx+r*Math.sin(phi)*Math.cos(theta), ty+r*Math.cos(phi), tz+r*Math.sin(phi)*Math.sin(theta));
+  camera.lookAt(tx,ty,tz);
+  renderer.render(scene,camera);
+}
+
+function bindUI(){
+  const play=document.getElementById('play');
+  play.onclick=()=>{ const s=data.scenarios[cur];
+    if(frame>=s.frames.length-1){ frame=0; } playing=!playing;
+    play.textContent=playing?'⏸ pause':'▶ play'; };
+  document.getElementById('time').oninput=e=>{ frame=+e.target.value; playing=false;
+    document.getElementById('play').textContent='▶ play'; };
+  // minimal orbit controls
+  let drag=false,px=0,py=0;
+  renderer.domElement.addEventListener('mousedown',e=>{drag=true;px=e.clientX;py=e.clientY;});
+  addEventListener('mouseup',()=>drag=false);
+  addEventListener('mousemove',e=>{ if(!drag)return;
+    orbit.theta-=(e.clientX-px)*0.005; orbit.phi=Math.max(0.15,Math.min(1.5,orbit.phi-(e.clientY-py)*0.005));
+    px=e.clientX;py=e.clientY; });
+  renderer.domElement.addEventListener('wheel',e=>{ e.preventDefault();
+    orbit.r=Math.max(90,Math.min(1600,orbit.r*(1+Math.sign(e.deltaY)*0.08))); },{passive:false});
+}
+function onResize(){ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight); }
+
+fetch('trajectories.json').then(r=>r.json()).then(d=>{ data=d; init(); })
+  .catch(e=>{ document.body.insertAdjacentHTML('beforeend',
+    '<div style="position:fixed;inset:0;display:grid;place-items:center;padding:2rem;text-align:center">'+
+    'Could not load trajectories.json.<br>Serve this folder over HTTP:<br>'+
+    '<code>python3 -m http.server</code> then open <code>localhost:8000/viz/</code></div>'); });
+</script>
+</body>
+</html>
