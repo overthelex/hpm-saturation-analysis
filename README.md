@@ -29,6 +29,8 @@ saturates, at what swarm size, and how to close the seams** — from the defende
 | `analysis/E3-results.md` | Preliminary E3 (core): conformal penetration-safety certificate — 94% coverage, 0 false-safe, 93% tight, and holds against an active adversary (worst leak in Â = 0.125 < τ). |
 | `analysis/E4-results.md` | Preliminary E4: subset-simulation certifies the tail probability Pr[leak≥τ]≈1e-3 where naive MC is blind; validated within 0.9× where naive is reliable. |
 | `analysis/E5-results.md` | Preliminary E5: Sobol sensitivity — one-to-many capacity n_cone and effective range R_eff co-dominate penetration; design guidance. |
+| `analysis/E6-results.md` | E6: MAP-Elites joint mode search — two full-breakthrough ridges (drop, hardening), no cheap third full mode. |
+| `analysis/E7-results.md` | E7: drone **speed** (to 600 km/h) is a partial third breakthrough axis; parallelized across all cores. |
 | `README-sim.md` | Simulation engine status & how to run. |
 
 ## Simulation

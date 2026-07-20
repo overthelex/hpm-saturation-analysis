@@ -129,4 +129,40 @@ if (file.exists("data_e5_sobol.csv")) {
   save_both(pE5, "fig_e5_sensitivity", 7.5, 4.4)
 }
 
-cat("\nAll E1-E5 figures rendered in the unified style.\n")
+## ---- E6: MAP-Elites quality-diversity map ----
+if (file.exists("data_e6_map.csv")) {
+  m6 <- read.csv("data_e6_map.csv")
+  pE6 <- ggplot(m6, aes(factor(hard_bin), factor(alt_bin), fill = leak)) +
+    geom_tile(color = "white", linewidth = 0.5) +
+    geom_text(aes(label = sprintf("%.2f", leak), color = leak > 0.5), size = 3.4,
+              show.legend = FALSE) +
+    scale_color_manual(values = c("grey20", "white")) +
+    scale_fill_viridis(name = "leak", limits = c(0, 1), option = "C") +
+    labs(title = "E6 — MAP-Elites: diverse failure modes of the hectare defense",
+         subtitle = "two full-breakthrough ridges: high altitude (zenith drop) and high hardening (R_eff collapse); no cheap third mode",
+         x = "drone hardening bin (0=soft → 5=+24 dB)",
+         y = "drop-altitude bin (0=direct → 5=~2 km)") +
+    theme_pub() + theme(panel.grid = element_blank())
+  save_both(pE6, "fig_e6_modes", 7.6, 5)
+}
+
+## ---- E7: speed as a third breakthrough axis ----
+if (file.exists("data_e7_speed.csv")) {
+  s7 <- read.csv("data_e7_speed.csv")
+  s7$t_c <- factor(paste0("t_c = ", s7$t_c, " s"))
+  vstar <- do.call(rbind, lapply(sort(unique(read.csv("data_e7_speed.csv")$t_c)), function(tc) {
+    S <- 1 / (1 - cos(30 * pi / 180)); data.frame(t_c = paste0("t_c = ", tc, " s"),
+                                                   vk = (500 - 15) / (S * tc) * 3.6) }))
+  pE7 <- ggplot(s7, aes(v_kmh, leak, color = t_c)) +
+    geom_line(linewidth = 1) + geom_point(size = 1.8) +
+    geom_vline(data = vstar, aes(xintercept = vk, color = t_c), linetype = "dashed",
+               alpha = 0.5, show.legend = FALSE) +
+    scale_color_viridis_d(name = NULL, end = 0.85) +
+    labs(title = "E7 — drone speed is a third breakthrough axis",
+         subtitle = "soft, direct swarm vs the calibrated hectare; dashed = analytic v* (Σ=1). 600 km/h erodes a defense that holds slow swarms",
+         x = "drone speed (km/h)", y = "leak fraction") +
+    theme_pub() + theme(legend.position = "top")
+  save_both(pE7, "fig_e7_speed", 7.6, 4.6)
+}
+
+cat("\nAll E1-E7 figures rendered in the unified style.\n")

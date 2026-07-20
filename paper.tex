@@ -41,7 +41,10 @@ yields a certified-safe envelope with valid coverage, zero false-safe region, $9
 tightness, and which survives an active adversarial search (E3); and that subset simulation
 certifies a small penetration probability $\Pr[\text{leak}\ge\tau]\approx10^{-3}$ that naive
 Monte-Carlo cannot resolve (E4); and that Sobol sensitivity attribution identifies the
-one-to-many capacity and effective range as the co-dominant design levers (E5).
+one-to-many capacity and effective range as the co-dominant design levers (E5). A
+quality-diversity joint search finds no cheap third full mode beyond the two hand-derived ones
+(E6), while a dedicated sweep shows drone \emph{speed} (up to 600\,km/h) is a genuine partial
+third breakthrough axis, scaling the saturation ratio linearly (E7).
 \end{abstract}
 
 \section{Introduction}
@@ -269,6 +272,36 @@ $\theta$ (beam width) & $-0.003$ & 0.041 \\
 \caption{E5. Sobol first-order ($S_1$) and total ($S_T$) indices with confidence intervals;
 $n_{\text{cone}}$ and $R_{\text{eff}}$ co-dominate the penetration variance.}
 \label{fig:e5}
+\end{figure}
+
+\subsection{E6/E7 --- joint mode search and the speed axis}
+Two further experiments probe for failure modes beyond the two hand-derived ones. \textbf{E6}
+runs a quality-diversity (MAP-Elites) \emph{joint} search over a combined attack genome
+(altitude, hardening, elevation, speed, azimuth seam-routing), mapping diverse
+high-penetration strategies rather than a single optimum (Fig.~\ref{fig:e6}). The map shows
+two full-breakthrough ridges---the zenith drop and the hardening collapse---and \emph{no}
+cheap third full mode: the direct-and-soft corner holds (leak $\approx0.09$). \textbf{E7}
+isolates drone \emph{speed} (up to $167$\,m/s $=600$\,km/h): since
+$\Sigma\propto t_c\,v$, fast drones shrink the engagement window, and speed is a genuine but
+\emph{partial} third axis---a $600$\,km/h soft, direct swarm erodes a hectare that holds
+against $2000$ slow drones, with strength set by the engagement cycle $t_c$
+(Fig.~\ref{fig:e7}). Both experiments run the simulator across all CPU cores
+(embarrassingly parallel; ${\sim}10\times$ wall-clock, bit-identical results).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.66\linewidth]{fig_e6_modes.png}
+\caption{E6. MAP-Elites diversity map (drop altitude $\times$ hardening): two full-breakthrough
+ridges (zenith drop, hardening collapse) and no cheap third mode.}
+\label{fig:e6}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.66\linewidth]{fig_e7_speed.png}
+\caption{E7. Leak vs drone speed for three engagement cycles; a $600$\,km/h swarm penetrates a
+defense that holds slow swarms. Dashed: analytic single-aperture $v^\ast$ (a lower bound).}
+\label{fig:e7}
 \end{figure}
 
 \section{Discussion and limitations}

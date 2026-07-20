@@ -1,0 +1,29 @@
+E6 — MAP-Elites joint search for diverse / new failure modes
+  defense: calibrated 4-corner hectare (holds direct soft attack); N=400
+  descriptors: (drop altitude x drone hardening), 6x6 map
+  budget: 40 init + 360 mutations (full)
+
+  MAP-Elites archive filled: 36 / 36 cells
+  leak map (rows=altitude bin 0..5, cols=hardening bin 0..5):
+    alt5 | 0.04 0.43 0.15 0.08 0.01 0.00
+    alt4 | 0.98 0.63 0.01 0.01 0.01 0.01
+    alt3 | 0.99 0.88 0.10 0.05 0.09 0.02
+    alt2 | 1.00 0.95 0.21 0.33 0.10 0.03
+    alt1 | 1.00 1.00 0.97 0.97 0.50 0.00
+    alt0 | 0.09 1.00 1.00 1.00 1.00 1.00
+           hard0 hard1 hard2 hard3 hard4 hard5
+
+  High-leak strategies (leak>=0.5) by ACTUAL lever used:
+                drop: 14 elite(s)
+           hardening: 2 elite(s)
+          high-speed: 0 elite(s)
+        seam-routing: 0 elite(s)
+    direct-soft-slow: 0 elite(s)
+
+  No FULL-breakthrough (leak>=0.5) mode outside drop / hardening in this genome.
+
+  Speed as a PARTIAL third axis: best leak by a direct+soft+fast (>396 km/h)
+  strategy = 0.09 (< full breakthrough at the calibrated t_c=1.0, but nonzero;
+  see E7 -- speed dominates once the engagement cycle t_c is larger / R_eff smaller).
+
+  wrote /home/vovkes/epirus/figures/data_e6_map.csv
