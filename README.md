@@ -28,6 +28,7 @@ saturates, at what swarm size, and how to close the seams** — from the defende
 | `analysis/E2-results.md` | Preliminary E2: black-box adversarial search autonomously rediscovers both hand-derived modes (zenith drop; hardening/R_eff collapse), leak 0→1.0. |
 | `analysis/E3-results.md` | Preliminary E3 (core): conformal penetration-safety certificate — 94% coverage, 0 false-safe, 93% tight, and holds against an active adversary (worst leak in Â = 0.125 < τ). |
 | `analysis/E4-results.md` | Preliminary E4: subset-simulation certifies the tail probability Pr[leak≥τ]≈1e-3 where naive MC is blind; validated within 0.9× where naive is reliable. |
+| `analysis/E5-results.md` | Preliminary E5: Sobol sensitivity — one-to-many capacity n_cone and effective range R_eff co-dominate penetration; design guidance. |
 | `README-sim.md` | Simulation engine status & how to run. |
 
 ## Simulation

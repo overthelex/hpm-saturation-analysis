@@ -108,4 +108,25 @@ pE4 <- ggplot(cc, aes(x, pmax(ccdf, 1e-4))) +
   theme_pub()
 save_both(pE4, "fig_e4_tail", 8, 5)
 
-cat("\nAll E1-E4 figures rendered in the unified style.\n")
+## ---- E5: Sobol sensitivity (design guidance) ----
+if (file.exists("data_e5_sobol.csv")) {
+  s5 <- read.csv("data_e5_sobol.csv")
+  s5$param <- factor(s5$param, levels = s5$param[order(s5$ST)])
+  long5 <- rbind(
+    data.frame(param = s5$param, index = "total (ST)", value = s5$ST, conf = s5$ST_conf),
+    data.frame(param = s5$param, index = "first-order (S1)",
+               value = pmax(s5$S1, 0), conf = s5$S1_conf))
+  pE5 <- ggplot(long5, aes(value, param, fill = index)) +
+    geom_col(position = position_dodge(width = 0.7), width = 0.62) +
+    geom_errorbarh(aes(xmin = pmax(value - conf, 0), xmax = value + conf),
+                   position = position_dodge(width = 0.7), height = 0.25, color = "grey30") +
+    scale_fill_manual(name = NULL, values = c("total (ST)" = "#d62728",
+                                              "first-order (S1)" = "#1f77b4")) +
+    labs(title = "E5 — what governs hectare-defense penetration (Sobol indices)",
+         subtitle = "one-to-many capacity n_cone and effective range R_eff co-dominate (CIs overlap); t_c next; θ, v second-order",
+         x = "Sobol index", y = NULL) +
+    theme_pub() + theme(legend.position = "top")
+  save_both(pE5, "fig_e5_sensitivity", 7.5, 4.4)
+}
+
+cat("\nAll E1-E5 figures rendered in the unified style.\n")

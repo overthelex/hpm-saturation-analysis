@@ -1,0 +1,21 @@
+E5 — Sobol global sensitivity of hectare-defense penetration
+  params: ['R_eff', 'theta', 't_c', 'n_cone', 'N', 'v']
+  Saltelli N=64 -> 512 model evals x 2 seeds (full)
+  evaluating 512 configurations ...
+
+  Sobol indices (S1 = first-order, ST = total-order; higher = more influential):
+       param |       S1 |       ST
+    --------------------------------
+      n_cone |    0.273 |    0.385
+       R_eff |    0.332 |    0.374
+         t_c |    0.178 |    0.306
+           N |    0.150 |    0.113
+           v |   -0.024 |    0.082
+       theta |   -0.003 |    0.041
+
+  DESIGN GUIDANCE: penetration variance is dominated by 'n_cone' (ST=0.38).
+  Interpretation: effective range R_eff encodes the hardening<->range axis
+  (R_eff proportional to 1/E_kill); it is the adversary's strongest lever and the
+  defender's first investment, ahead of the one-to-many capacity and beam/cycle.
+  wrote /home/vovkes/epirus/figures/data_e5_sobol.csv
+  figure -> /home/vovkes/epirus/analysis/e5_sobol.png

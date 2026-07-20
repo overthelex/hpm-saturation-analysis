@@ -40,7 +40,8 @@ bare ``maximize penetration'' objective (E2); that a distribution-free conformal
 yields a certified-safe envelope with valid coverage, zero false-safe region, $93\%$
 tightness, and which survives an active adversarial search (E3); and that subset simulation
 certifies a small penetration probability $\Pr[\text{leak}\ge\tau]\approx10^{-3}$ that naive
-Monte-Carlo cannot resolve (E4).
+Monte-Carlo cannot resolve (E4); and that Sobol sensitivity attribution identifies the
+one-to-many capacity and effective range as the co-dominant design levers (E5).
 \end{abstract}
 
 \section{Introduction}
@@ -233,6 +234,43 @@ $\pm$sd) resolves the penetration probability where naive MC has a single sample
 \label{fig:e4}
 \end{figure}
 
+\subsection{E5 --- sensitivity attribution and design guidance}
+Global (variance-based) Sobol indices identify what governs penetration of the hectare
+defense, turning the certificate into design guidance. Over six parameters (Saltelli $N=64$,
+$512$ configurations, direct attack), the one-to-many capacity $n_{\text{cone}}$ and the
+effective range $R_{\text{eff}}$ are statistically \emph{co-dominant} (overlapping confidence
+intervals), followed by the engagement cycle $t_c$; beam half-angle and approach speed are
+second-order in this regime (Table~\ref{tab:e5}, Fig.~\ref{fig:e5}). The guidance is to invest
+first in $n_{\text{cone}}$ and $R_{\text{eff}}$; the adversary's strongest lever is collapsing
+$R_{\text{eff}}$ via drone hardening ($R_{\text{eff}}\propto1/E_{\text{kill}}$), the
+quantitative confirmation of the E2 hardening mode.
+
+\begin{table}[h]
+\centering
+\caption{E5: Sobol indices for hectare-defense penetration (direct attack, $N=64$).}
+\label{tab:e5}
+\begin{tabular}{lcc}
+\toprule
+Parameter & $S_1$ & $S_T$ \\
+\midrule
+$n_{\text{cone}}$ (one-to-many) & 0.273 & \textbf{0.385} \\
+$R_{\text{eff}}$ (range / hardening) & 0.332 & \textbf{0.374} \\
+$t_c$ (cycle) & 0.178 & 0.306 \\
+$N$ (swarm size) & 0.150 & 0.113 \\
+$v$ (speed) & $-0.024$ & 0.082 \\
+$\theta$ (beam width) & $-0.003$ & 0.041 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.72\linewidth]{fig_e5_sensitivity.png}
+\caption{E5. Sobol first-order ($S_1$) and total ($S_T$) indices with confidence intervals;
+$n_{\text{cone}}$ and $R_{\text{eff}}$ co-dominate the penetration variance.}
+\label{fig:e5}
+\end{figure}
+
 \section{Discussion and limitations}
 The certificate is \emph{with respect to the simulator model}; parameters are
 order-of-magnitude on open sources, and the method is fidelity-agnostic---it transfers verbatim
@@ -248,9 +286,10 @@ We recast ``does this air defense hold?'' as a certification problem and transfe
 certified-robustness machinery to physical directed-energy area defense. A GP surrogate under
 level-set active learning recovers the failure boundary sample-efficiently; black-box
 adversarial search autonomously rediscovers real vulnerability modes; a conformal certificate
-yields a verified penetration-safety envelope; and subset simulation certifies its rare-event
-tail. The pieces compose into a pipeline that turns an engineering simulation into a provable,
-adversarially-verified statement about a physical defense.
+yields a verified penetration-safety envelope; subset simulation certifies its rare-event
+tail; and Sobol attribution turns it into design guidance. The pieces compose into a pipeline
+that turns an engineering simulation into a provable, adversarially-verified statement about a
+physical defense.
 
 \begin{thebibliography}{9}
 \small
