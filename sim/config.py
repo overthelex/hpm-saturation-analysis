@@ -97,6 +97,11 @@ class ThreatConfig:
     # seam-routing knobs (used when scenario in {S3,S4} and isr=='perfect')
     seam_az_spread_deg: float = 6.0   # concentration of azimuth around inter-aperture gaps
     seam_zenith_frac: float = 0.25    # fraction routed through the zenith gap (above el_max)
+    # zenith-drop attack (scenario 'S6'): climb over the centre, then cut power and free-fall.
+    # Once falling with electronics OFF the drone is INERT MASS -> immune to a soft-kill HPM.
+    apogee_h: float = 400.0           # altitude of the drop point over the asset, m
+    fall_v: float = 25.0              # descent speed once unpowered, m/s
+    fall_drift: float = 3.0           # 1-sigma horizontal drift while falling (CEP driver), m/s
 
 
 @dataclass

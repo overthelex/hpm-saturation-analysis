@@ -18,6 +18,7 @@ saturates, at what swarm size, and how to close the seams** — from the defende
 | `hpm-swarm-sim-design.md` | Design of the 3D agent simulation (method, scenarios, validation, roadmap). |
 | `epirus-pitch-memo.md` | One-page technical memo (envelope + 3 lead numbers + 3 fixes). |
 | `hectare-results.md` | Worked case: 1 hectare defended by 4 installations. |
+| `zenith-drop-results.md` | Over-the-top attack: drop into the zenith cone of silence; soft-kill can't stop inert falling mass ("hail" of dead-but-detonating drones). |
 | `leonidas-video-summary.md` | Section summary of the source video. |
 | `README-sim.md` | Simulation engine status & how to run. |
 

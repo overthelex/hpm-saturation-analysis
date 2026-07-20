@@ -64,6 +64,9 @@ class World:
         self.kin_credit = 0.0
         self.kin_mag_left = defense.kin_magazine
         self.kin_kills = 0
+        # zenith-drop (S6): per-drone immunity once electronics are cut for the ballistic fall
+        self.immune = np.zeros(len(pos), dtype=bool)
+        self._apex = self.asset + np.array([0.0, 0.0, threat.apogee_h])
         # diagnostics
         self.leak_via_seam = 0   # leakers that were illegal for all apertures at contact
         self.holds_fratricide = 0  # aperture-ticks idled with tracks present but all no-fire
@@ -117,6 +120,21 @@ class World:
         dt = self.s.dt
         self.time += dt
 
+        # zenith-drop transition: a climbing drone that reaches the apogee cuts power and
+        # begins a ballistic fall (electronics OFF -> immune to soft-kill HPM thereafter).
+        if self.t.scenario == "S6":
+            climbing = (self.status == ALIVE) & (~self.immune)
+            if np.any(climbing):
+                d_apex = np.linalg.norm(self.pos - self._apex, axis=1)
+                reached = climbing & (d_apex < 12.0)
+                if np.any(reached):
+                    idx = np.flatnonzero(reached)
+                    self.immune[idx] = True
+                    drift = self.t.fall_drift * self.rng.standard_normal((idx.size, 2))
+                    self.vel[idx, 0] = drift[:, 0]
+                    self.vel[idx, 1] = drift[:, 1]
+                    self.vel[idx, 2] = -self.t.fall_v
+
         # move drones (alive only) and mobile apertures
         alive = self.status == ALIVE
         self.pos[alive] += self.vel[alive] * dt
@@ -148,22 +166,20 @@ class World:
         escaped = (self.status == ALIVE) & (d_asset > self.t.r_spawn * 1.3)
         self.status[escaped] = ESCAPED
 
-        # ---- sensor: build track set (alive, within detect, up to T_max urgent) ----
-        alive_idx = np.flatnonzero(self.status == ALIVE)
-        if alive_idx.size == 0:
-            return
-        if self.d.r_detect is not None:
+        # ---- sensor: build track set for the HPM effector ----
+        # Immune drones (electronics off, ballistic fall) are INVISIBLE to a soft-kill HPM:
+        # zapping inert mass does nothing. The kinetic layer below can still hit them.
+        alive_idx = np.flatnonzero((self.status == ALIVE) & (~self.immune))
+        if self.d.r_detect is not None and alive_idx.size:
             alive_idx = alive_idx[d_asset[alive_idx] <= self.d.r_detect]
-        # urgency = time-to-contact
-        ttc = (d_asset[alive_idx] - self.d.r_contact) / max(self.t.v, 1e-6)
         if self.d.t_max_tracks is not None and alive_idx.size > self.d.t_max_tracks:
+            ttc = (d_asset[alive_idx] - self.d.r_contact) / max(self.t.v, 1e-6)
             keep = np.argsort(ttc)[: self.d.t_max_tracks]
             alive_idx = alive_idx[keep]
-            ttc = ttc[keep]
         tracked = set(alive_idx.tolist())
 
         # ---- scheduler: greedy earliest-deadline-first per free aperture ----
-        for ai in range(len(self.ap_pos)):
+        for ai in range(len(self.ap_pos)) if tracked else ():
             if self.ap_busy[ai] > self.time:
                 continue
             cur = np.array(sorted(tracked), dtype=int)

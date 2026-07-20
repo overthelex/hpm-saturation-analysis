@@ -85,6 +85,18 @@ def spawn(threat: ThreatConfig, defense: DefenseConfig):
     """
     rng = np.random.default_rng(threat.seed)
     center = np.asarray(defense.asset_pos, float)
+
+    if threat.scenario == "S6":
+        # zenith drop: groups approach from all sides at altitude, climbing toward a
+        # drop point (apogee) over the asset. Heading is set toward that apogee point.
+        pos = _sample_shell(rng, threat.n, threat.r_spawn,
+                            threat.az_range_deg, threat.el_range_deg, center)
+        apex = center + np.array([0.0, 0.0, threat.apogee_h])
+        to_apex = apex - pos
+        dist = np.linalg.norm(to_apex, axis=1, keepdims=True)
+        vel = threat.v * to_apex / np.maximum(dist, 1e-9)
+        return pos.astype(float), vel.astype(float)
+
     seam = threat.scenario in ("S3", "S4", "S5") and threat.isr == "perfect"
     if seam and len(defense.apertures) >= 2:
         pos = _seam_spawn(rng, threat, defense, center)
