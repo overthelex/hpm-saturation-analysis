@@ -22,6 +22,7 @@ saturates, at what swarm size, and how to close the seams** — from the defende
 | `leonidas-video-summary.md` | Section summary of the source video. |
 | `research-proposal-certified-defense.md` | Research proposal: certified penetration-safety envelopes for area defense (adversarial-robustness / certification transfer from ML). |
 | `analysis/E1-results.md` | Preliminary E1: GP surrogate + level-set active learning recovers the failure boundary to 0.038 s using 14% of a dense grid, +79% vs random. |
+| `analysis/E2-results.md` | Preliminary E2: black-box adversarial search autonomously rediscovers both hand-derived modes (zenith drop; hardening/R_eff collapse), leak 0→1.0. |
 | `README-sim.md` | Simulation engine status & how to run. |
 
 ## Simulation

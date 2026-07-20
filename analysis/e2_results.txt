@@ -1,0 +1,18 @@
+E2 — black-box adversarial search: rediscovery of known vulnerability modes
+  defense: 4-corner hectare, theta=30 n_cone=49 el_max=80 R_eff=500 (holds direct)
+  optimizer: differential_evolution; N=200, 2 seeds/eval
+
+  baseline naive direct attack: leak=0.000
+
+  [Search 1] geometry only, soft COTS -> expected mode: ZENITH DROP
+    best leak = 1.000   discovered: mode=S6 el=[33,50] apogee=869m
+    rediscovered zenith drop: YES
+
+  [Search 2] direct approach + hardening -> expected lever: R_eff COLLAPSE
+    best leak = 1.000   discovered: hardening=21.9 dB -> R_eff_eff=40 m (v=39, el~45)
+    rediscovered hardening collapse: YES
+
+  SUMMARY: from a bare 'maximize penetration' objective the optimizer independently
+  found both adversarial modes derived by hand (zenith drop; R_eff/E_kill collapse).
+
+  figure -> /home/vovkes/epirus/analysis/e2_trace.png
