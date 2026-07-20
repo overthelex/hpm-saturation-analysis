@@ -4,3 +4,12 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 *.egg-info/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
