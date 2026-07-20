@@ -3,25 +3,42 @@
 
 Run:  python3 hectare_experiment.py
 
-Geometry: asset (vital point) at centre; 4 apertures at the corners of the 100 m square
-(ring radius = 70.7 m). A drone is a LEAKER if it reaches the vital point (r<15 m) OR
-comes within 8 m of any installation ("подлететь вплотную к установке"). Swarm surrounds
-from all sides (S0) and, worst case, with perfect knowledge of the layout (S4 seam-routing).
+CALIBRATED to open-source data (see hpm-open-source-intel.md):
+  theta = 30 deg (public "~60-degree arc" wide/sector mode)
+  n_cone = 49    (one pulse defeated a 49-drone swarm, 26 Aug 2025)
+  t_c   = 1.0 s  (swarm burst-mode sector-clear cycle; a single isolated drone is ~4 s)
+  R_eff : swept as EFFECTIVE range, which encodes both nominal range AND target hardening.
+          Physics: E(r)=sqrt(30*ERP)/r, so R_eff ∝ 1/E_kill -> +20 dB drone shielding
+          shrinks effective R_eff by ~10x. That is the real exploitable axis, not raw N.
 
-Sweeps the one parameter that dominates and is classified — per-installation range r_eff —
-against swarm size N. Numbers are order-of-magnitude on open assumptions (model §10).
+Geometry: vital point at centre; 4 apertures at the corners of the 100 m square
+(ring radius 70.7 m). A LEAKER reaches the vital point (r<15 m) OR comes within 8 m of any
+installation. Swarm surrounds from all sides (S0) and, worst case, with perfect knowledge
+of the layout (S4 seam-routing). Numbers are order-of-magnitude (model §10).
 """
 import statistics as st
 from sim import DefenseConfig, Aperture, ThreatConfig, SimConfig, simulate
 
-SEEDS = range(4)
+SEEDS = range(3)
 SIM = SimConfig(dt=0.03)
-CORNERS = [(50, 50, 3), (-50, 50, 3), (-50, -50, 3), (50, -50, 3)]  # 100x100 m, 3 m mast
+CORNERS = [(50, 50, 3), (-50, 50, 3), (-50, -50, 3), (50, -50, 3)]
+
+# calibrated defense
+THETA, N_CONE, T_C, EL_MAX = 30.0, 49, 1.0, 80.0
+
+# effective range rows, labelled by what shrinks/extends them (target hardening)
+R_ROWS = [
+    (1000, "soft COTS, long range"),
+    (500,  "soft COTS, mid range"),
+    (200,  "+14 dB hardened  (R_eff/5)"),
+    (50,   "+20 dB hardened  (R_eff/10)"),
+]
+N_COLS = (100, 300, 600, 1000, 2000)
 
 
-def hectare(r_eff, theta=10.0, t_c=0.3, n_cone=2, **over):
-    aps = [Aperture(pos=p, theta_deg=theta, r_eff=r_eff, t_c=t_c,
-                    n_cone=n_cone, el_max_deg=80.0) for p in CORNERS]
+def hectare(r_eff, **over):
+    aps = [Aperture(pos=p, theta_deg=THETA, r_eff=r_eff, t_c=T_C,
+                    n_cone=N_CONE, el_max_deg=EL_MAX) for p in CORNERS]
     d = DefenseConfig(apertures=aps, asset_pos=(0, 0, 0),
                       r_contact=15.0, ap_contact=8.0, asset_keepout=10.0)
     for k, v in over.items():
@@ -39,34 +56,38 @@ def mc(dfac, scenario, isr, n, v=32):
             st.mean(r.kills_before_first_leak for r in res))
 
 
-def section(t): print("\n" + "=" * 72 + f"\n{t}\n" + "=" * 72)
+def section(t): print("\n" + "=" * 78 + f"\n{t}\n" + "=" * 78)
 
 
-section("1 hectare, 4 installations at the corners — breakthrough vs range & swarm size")
+section("1 hectare, 4 installations — CALIBRATED (theta=30, n_cone=49, t_c=1s)")
 print("  leak = fraction of swarm reaching the vital point or an installation")
-print("  (blind = surround from all sides; ISR = attacker knows the 4 positions)\n")
-header = f"  {'r_eff':>6} | " + " | ".join(f"N={n:<4d}" for n in (100, 300, 600, 1000))
-for r_eff in (120, 200, 350, 500):
+print("  cell = leak(blind) / leak(perfect-ISR).  R_eff = EFFECTIVE range (m).\n")
+print(f"  {'R_eff (effective)':<28} | " + " | ".join(f"N={n:<4d}" for n in N_COLS))
+print("  " + "-" * 76)
+for r_eff, label in R_ROWS:
     cells = []
-    for n in (100, 300, 600, 1000):
+    for n in N_COLS:
         lb, _ = mc(lambda r_eff=r_eff: hectare(r_eff), "S0", "blind", n)
         lp, _ = mc(lambda r_eff=r_eff: hectare(r_eff), "S4", "perfect", n)
         cells.append(f"{lb:.2f}/{lp:.2f}")
-    if r_eff == 120:
-        print(header)
-        print("  " + "-" * (len(header) - 2))
-    print(f"  {r_eff:>6} | " + " | ".join(f"{c:>9}" for c in cells))
-print("\n  cell = leak(blind) / leak(perfect-ISR).  r_eff in meters.")
+    print(f"  {r_eff:>4} m  {label:<19} | " + " | ".join(f"{c:>9}" for c in cells))
 
-section("Same site + the two fixes (r_eff=200, N=600, perfect-ISR worst case)")
-base, cost = mc(lambda: hectare(200), "S4", "perfect", 600)
-mob, _ = mc(lambda: hectare(200, orbit_rate=0.4), "S4", "perfect", 600)
-kin, _ = mc(lambda: hectare(200, kin_radius=60, kin_rate=6, kin_magazine=200, kin_pk=0.9),
-            "S4", "perfect", 600)
+section("The hardening axis: same site, N=600 blind, sweep effective range")
+for r_eff, label in R_ROWS:
+    lb, cost = mc(lambda r_eff=r_eff: hectare(r_eff), "S0", "blind", 600)
+    print(f"  R_eff={r_eff:>4} m ({label:<26}) leak={lb:.3f}  kills_before_1st_leak={cost:.0f}")
+print("\n  -> against unshielded COTS the one-to-many pulse (n_cone=49) makes 4 units very")
+print("     robust to raw numbers; the swarm's real lever is HARDENING, which collapses")
+print("     effective R_eff (physics: R_eff ∝ 1/E_kill) — not fielding more drones.")
+
+section("Fixes at the contested point (R_eff=200 m, N=1000, perfect-ISR)")
+base, _ = mc(lambda: hectare(200), "S4", "perfect", 1000)
+mob, _ = mc(lambda: hectare(200, orbit_rate=0.4), "S4", "perfect", 1000)
+kin, _ = mc(lambda: hectare(200, kin_radius=60, kin_rate=6, kin_magazine=300, kin_pk=0.9),
+            "S4", "perfect", 1000)
 both, _ = mc(lambda: hectare(200, orbit_rate=0.4, kin_radius=60, kin_rate=6,
-                             kin_magazine=200, kin_pk=0.9), "S4", "perfect", 600)
-print(f"  baseline (static, HPM only) : leak={base:.3f}   kills_before_1st_leak={cost:.0f}")
+                             kin_magazine=300, kin_pk=0.9), "S4", "perfect", 1000)
+print(f"  baseline (static, HPM only) : leak={base:.3f}")
 print(f"  + rotating installations    : leak={mob:.3f}")
 print(f"  + inner kinetic bubble      : leak={kin:.3f}")
 print(f"  + both fixes                : leak={both:.3f}")
-print("\n(Interpretation printed by the script is descriptive; see model §8 for the mechanism.)")

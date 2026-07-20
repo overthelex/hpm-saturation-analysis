@@ -42,7 +42,8 @@ Requires `numpy` (`scipy` reserved for the future Hungarian scheduler).
   `T_r = S·t_c > τ = (R_eff−R_c)/v`, independent of N. The sim lands on the `Σ=1` threshold.
 - A ring has a **by-design interior blind volume** (firing inward = fratricide); a rear
   swarm leaks 100% with the mask on, 0% off.
-- **1 hectare / 4 installations:** holds absolutely below a range-dependent threshold
-  `N_min ≈ 150–500`, then breaks; a ~600–1000 swarm exceeds the ceiling at any realistic
-  range. Mobility helps only against ISR-dependent attacks; a kinetic bubble is the robust
-  closer near threshold — deep saturation needs more mass, not refinement.
+- **1 hectare / 4 installations (calibrated `n_cone=49`, `θ=30°`):** against unshielded COTS
+  the one-to-many pulse makes the site robust to **raw numbers** — it holds absolutely even
+  at N=2000. The swarm's real lever is **hardening**: `R_eff ∝ 1/E_kill`, so +20 dB of drone
+  shielding collapses effective range ~10× and breaks the defense (leak 0.67 at N=600). ISR
+  value and the mobility/kinetic fixes matter only in that short-effective-range regime.
