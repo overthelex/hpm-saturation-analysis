@@ -20,6 +20,7 @@ saturates, at what swarm size, and how to close the seams** — from the defende
 | `hectare-results.md` | Worked case: 1 hectare defended by 4 installations. |
 | `zenith-drop-results.md` | Over-the-top attack: drop into the zenith cone of silence; soft-kill can't stop inert falling mass ("hail" of dead-but-detonating drones). |
 | `leonidas-video-summary.md` | Section summary of the source video. |
+| `research-proposal-certified-defense.md` | Research proposal: certified penetration-safety envelopes for area defense (adversarial-robustness / certification transfer from ML). |
 | `README-sim.md` | Simulation engine status & how to run. |
 
 ## Simulation
